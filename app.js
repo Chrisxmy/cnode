@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var topic = require('./routes/topic');
+
+require('./servers/mongdb_server')
+
 var app = express();
 
 // view engine setup

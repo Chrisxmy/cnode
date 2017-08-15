@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const User = require("../models/in_memo/users");
+const User = require("../models/mongo/users");
 
 /* localhost:8888/user/ */
 router
@@ -45,7 +45,7 @@ router
   .route("/:id")
   .get((req, res, next) => {
     (async () => {
-      let user = await User.getUserById(Number(req.params.id));
+      let user = await User.getUserById(req.params.id);
       return {
         code: 0,
         user: user
@@ -60,8 +60,8 @@ router
   })
   .patch((req, res, next) => {
     (async () => {
-      let user = await User.updateUserById(Number(req.params.id), {
-        name:req.body.name,
+      let user = await User.updateUserById(req.params.id, {
+        name:req.body.name || undefined,
         age:req.body.age
       });
       return {
