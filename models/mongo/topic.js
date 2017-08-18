@@ -2,17 +2,23 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
+const replySchema = new mongoose.Schema({
+  content:{type: String, required: true},
+  userId: {type: String}
+})
+
 const TopicSchema = new Schema({
-  creatorId: { type: Number },
-  title: { type: String },
-  content: { type: String }
+  creator: { type: String},
+  title: { type: String,required: true},
+  content: { type: String, required: true },
+  replyLists: [replySchema]
 });
 
 const TopicModel = mongoose.model("topic", TopicSchema);
 
 async function createNewTopic(params) {
   const topic = new TopicModel({
-    creator: params.creator,
+    creator: params.creator._id,
     title: params.title,
     content: params.content
   });
@@ -46,10 +52,22 @@ async function updateTopicById(topicId, update) {
   });
 }
 
+async function createReply(params) {
+  return await TopicModel.findOneAndUpdate(
+    {_id: params.topicId},
+    {$push: {replyLists: {creator: params.creator, content: params.content}}},
+    {new: true})
+    .catch(e => {
+      console.log(e)
+      throw new Error(`error replying topic ${JSON.stringify(params)}`)
+    })
+}
+
 module.exports = {
   model: TopicModel,
   createNewTopic,
   getTopics,
   getTopicById,
-  updateTopicById
+  updateTopicById,
+  createReply
 };
