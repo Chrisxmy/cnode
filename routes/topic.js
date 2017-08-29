@@ -5,6 +5,12 @@ const Topic = require("../models/mongo/topic");
 
 const auth = require('../middleware/auth_user')
 
+const path  = require('path')
+const multer = require('multer')
+
+const upload = multer({dest: path.join(__dirname, '../public/images')})
+
+
 /* localhost:8888/topic/ */
 router
   .route("/")
@@ -24,13 +30,15 @@ router
       });
     // res.send("tring to get uesr list");
   })
-  .post((req, res, next) => {
+  .post(auth(),upload.single('titleImg'),(req, res, next) => {
     (async () => {
+      let titleImg = `http://localhost:8686/images/${req.file.filename}`
       const user = await User.getUserById(req.body.userId)
       let topic = await Topic.createNewTopic({
         creator:user,
         title: req.body.title,
-        content:req.body.content
+        content:req.body.content,
+        titleImg: titleImg
       });
       return {
         code: 0,
@@ -88,7 +96,7 @@ router
            if(!user) {throw new Error('Invalid user id')}
            let topic = await Topic.createReply({
              topicId:req.params.id,
-             creator: user,
+             replyer: user,
              content: req.body.content
            })
            return {

@@ -17,7 +17,7 @@ module.exports = function(options) {
       if (Date.now() - obj.expire > 0) throw new Error("token expired");
       next();
     } catch (e) {
-      res.status(401)
+      e.status = 401
       next(e);
     }
   };

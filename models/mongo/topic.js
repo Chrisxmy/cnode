@@ -4,23 +4,27 @@ const Schema = mongoose.Schema;
 
 const replySchema = new mongoose.Schema({
   content:{type: String, required: true},
-  userId: {type: String}
+  replyer: {type: Object}
 })
 
 const TopicSchema = new Schema({
-  creator: { type: String},
+  creator: { type: Object},
   title: { type: String,required: true},
   content: { type: String, required: true },
-  replyLists: [replySchema]
+  replyLists: [replySchema],
+  time: { type: String},
+  titleImg: {type: String}
 });
 
 const TopicModel = mongoose.model("topic", TopicSchema);
 
 async function createNewTopic(params) {
   const topic = new TopicModel({
-    creator: params.creator._id,
+    creator: params.creator,
     title: params.title,
-    content: params.content
+    content: params.content,
+    time: Date.now(),
+    titleImg: params.titleImg
   });
   return await topic.save().catch(e => {
     console.log(e);
@@ -55,7 +59,7 @@ async function updateTopicById(topicId, update) {
 async function createReply(params) {
   return await TopicModel.findOneAndUpdate(
     {_id: params.topicId},
-    {$push: {replyLists: {creator: params.creator, content: params.content}}},
+    {$push: {replyLists: {replyer: params.replyer, content: params.content}}},
     {new: true})
     .catch(e => {
       console.log(e)

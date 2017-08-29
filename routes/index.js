@@ -5,8 +5,11 @@ const User = require("../models/mongo/users");
 const JWT = require("jsonwebtoken");
 const JWT_SECRET = require("../cipher").JWT_SECRET;
 
+
+router.post('/img')
+
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express" });
+  res.render("index", { title: "Express" }); 
 });
 
 router.post("/login", function(req, res, next) {
@@ -17,7 +20,7 @@ router.post("/login", function(req, res, next) {
       {
         _id: user._id,
         lat: Date.now(),
-        expire: Date.now() + 24 * 60 * 60 * 1000
+        expire: Date.now() + 1000 * 60 * 60 * 24
       },
       JWT_SECRET
     );

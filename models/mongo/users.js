@@ -7,9 +7,9 @@ const SALT = require("../../cipher").PASSWORD_SALT;
 
 const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
-  age: { type: Number, max: [90, "nobody over 90 could use postman"] },
   phoneNumber: String,
-  password: String
+  password: String,
+  avatar: String
 });
 
 const DEFAULT_PROJECTION = { password: 0, phoneNumber: 0 };
@@ -19,9 +19,8 @@ const UserModel = mongoose.model("user", UserSchema);
 async function createNewUser(params) {
   const user = new UserModel({
     name: params.name,
-    age: params.age,
     phoneNumber: params.phoneNumber,
-    password: params.password
+    password: params.password,
   });
 
   user.password = await pbkdf2Async(user.password, SALT, 512, 128, "sha1")
