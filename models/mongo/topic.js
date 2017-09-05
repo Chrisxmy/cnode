@@ -30,11 +30,17 @@ async function createNewTopic(params) {
     console.log(e);
     throw Error(e);
   });
+}``
+
+
+async function getTopicsCount() {
+  return await TopicModel.find({}).count()
 }
 
-async function getTopics(params = { page: 0, pageSize: 10 }) {
+async function getTopics(params = { pageNumber: 0, pageSize: 5 }) {
   let flow = TopicModel.find({});
-  flow.skip(params.page * params.pageSize);
+  let count = TopicModel.find({}).count()
+  flow.skip(params.pageNumber * params.pageSize);
   flow.limit(params.pageSize);
   return await flow.catch(e => {
     throw new Error(e);
@@ -71,6 +77,7 @@ module.exports = {
   model: TopicModel,
   createNewTopic,
   getTopics,
+  getTopicsCount,
   getTopicById,
   updateTopicById,
   createReply

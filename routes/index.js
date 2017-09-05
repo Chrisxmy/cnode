@@ -5,16 +5,18 @@ const User = require("../models/mongo/users");
 const JWT = require("jsonwebtoken");
 const JWT_SECRET = require("../cipher").JWT_SECRET;
 
+const Errors = require("../error");
 
-router.post('/img')
+router.post("/img");
 
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express" }); 
+  res.render("index", { title: "Express" });
 });
 
 router.post("/login", function(req, res, next) {
   (async () => {
-    const user = await User.login(req.body.phoneNumber, req.body.password);
+
+    const user = await User.login(req.body.username, req.body.password);
 
     const token = JWT.sign(
       {

@@ -4,10 +4,10 @@ const crypto = require("crypto");
 const bluebird = require("bluebird");
 const pbkdf2Async = bluebird.promisify(crypto.pbkdf2);
 const SALT = require("../../cipher").PASSWORD_SALT;
+const Errors = require("../../error");
 
 const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
-  phoneNumber: String,
   password: String,
   avatar: String
 });
@@ -19,7 +19,6 @@ const UserModel = mongoose.model("user", UserSchema);
 async function createNewUser(params) {
   const user = new UserModel({
     name: params.name,
-    phoneNumber: params.phoneNumber,
     password: params.password,
   });
 
@@ -34,10 +33,10 @@ async function createNewUser(params) {
     console.log(e);
     switch (e.code) {
       case 11000:
-        throw Error("someone has picked that name");
+        throw new Errors.sign(params.name);
         break;
       default:
-        throw Error(`error creating user ${JSON.stringify(params)}`);
+        throw new Errors.ValidationError('user',`error creating user ${JSON.stringify(params)}`);
         break;
     }
   });
@@ -76,21 +75,21 @@ async function updateUserById(userId, update) {
     throw new Error(`error updating user by id: ${userId}`);
   });
 }
-async function login(phoneNumber, password) {
+async function login(username, password) {
      password = await pbkdf2Async(password, SALT, 512, 128, "sha1")
     .then(r => r.toString())
     .catch(e => {
       console.log(e);
-      throw new Error("something goes wrong");
+      throw new Errors.InternalError("something goes wrong inside the server");
     });
-  const user =  await UserModel.findOne({ phoneNumber:phoneNumber, password:password})
+  const user =  await UserModel.findOne({ name:username, password:password})
       .select(DEFAULT_PROJECTION)
       .catch(e=>{
         console.log(`error logging in ,phone ${phoneNumber}`, {err:e.stack || e})
-        throw new Error('something wrong with server')
+         throw new Errors.InternalError("something goes wrong inside the server");
       })
 
-      if(!user) throw Error('no such user')
+      if(!user)  throw new Errors.login()
       return user       
 }
 

@@ -9,7 +9,7 @@ const multer = require('multer')
 
 const upload = multer({dest: path.join(__dirname, '../public/images')})
 
-const HOST = process.env.NODE_ENV === 'production' ? 'http://host/' : 'http:localhost:8686'
+const HOST = process.env.NODE_ENV === 'production' ? 'http://host/' : 'http://localhost:8686'
 
 /* localhost:8888/user/ */
 router
@@ -34,7 +34,6 @@ router
     (async () => {
       let users = await User.createNewUser({
         name: req.body.username,
-        phoneNumber: req.body.phoneNumber,
         password: req.body.password
       });
       return {
@@ -69,11 +68,11 @@ router
   })
   .patch(auth(), upload.single('avatar'), (req, res, next) => {
     (async () => {
+      console.log(req.file)
       let update = {}
       if(req.body.name) update.name = req.body.name
-      update.avatar = `/public/images/${req.file.filename}`
+      update.avatar = `${HOST}/images/${req.file.filename}`
       let user = await User.updateUserById(req.params.id, update);
-      user.avatar = `${HOST}${user.avatar}`
       return {
         code: 0,
         user: user,

@@ -16,10 +16,16 @@ router
   .route("/")
   .get((req, res, next) => {
     (async () => {
-      let topics = await Topic.getTopics();
+      let params = {
+         pageNumber: Number(req.query.pageNumber),
+         pageSize: Number(req.query.pageSize)
+      } 
+      let topics = await Topic.getTopics(params);
+      var count = await Topic.getTopicsCount()
       return {
         code: 0,
-        topics: topics
+        topics: topics,
+        count: count
       };
     })()
       .then(r => {
