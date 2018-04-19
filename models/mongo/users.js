@@ -5,6 +5,7 @@ const bluebird = require("bluebird");
 const pbkdf2Async = bluebird.promisify(crypto.pbkdf2);
 const SALT = require("../../cipher").PASSWORD_SALT;
 const Errors = require("../../error");
+const logger = require('../../utils/loggers').logger
 
 const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
@@ -25,14 +26,13 @@ async function createNewUser(params) {
   user.password = await pbkdf2Async(user.password, SALT, 512, 128, "sha1")
     .then()
     .catch(e => {
-      console.log(e);
       throw new Error("something goes wrong");
     });
 
   let created = await user.save().catch(e => {
-    console.log(e);
     switch (e.code) {
       case 11000:
+        logger.error('error creating  user' , e)
         throw new Errors.sign(params.name);
         break;
       default:
@@ -101,3 +101,5 @@ module.exports = {
   updateUserById,
   login
 };
+
+
