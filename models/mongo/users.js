@@ -10,7 +10,8 @@ const logger = require('../../utils/loggers').logger
 const UserSchema = new Schema({
   name: { type: String, required: true, unique: true },
   password: String,
-  avatar: String
+  avatar: String,
+  points: Number
 });
 
 const DEFAULT_PROJECTION = { password: 0, phoneNumber: 0 };
@@ -57,6 +58,13 @@ async function getUsers(params = { page: 0, pageSize: 10 }) {
   });
 }
 
+async function getAllUsers() {
+  let flow = UserModel.find({});
+  return await flow.catch(e => {
+    throw new Error(e);
+  });
+}
+
 async function getUserById(userId) {
   return await UserModel.findOne({ _id: userId })
     .select(DEFAULT_PROJECTION)
@@ -93,13 +101,20 @@ async function login(username, password) {
       return user       
 }
 
+async function incrPoints (userId,points) {
+   const user =  await UserModel.findOneAndUpdate({_id:userId}, {$inc:{points:points}}, {new:true, fields: {points:1}})
+   return user.points
+}
+
 module.exports = {
   model: UserModel,
   createNewUser,
   getUsers,
+  getAllUsers,
   getUserById,
   updateUserById,
-  login
+  login,
+  incrPoints
 };
 
 

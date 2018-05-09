@@ -5,8 +5,4 @@ let redis = new Redis({
     port:6379,
 })
 
- redis.set('shel','xmy')
-
-
-
  module.exports = redis

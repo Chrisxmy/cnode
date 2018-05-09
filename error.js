@@ -51,6 +51,21 @@ class login extends ValidationError {
   }
 }
 
+class AlreadyLikedError extends httpError {
+  constructor (userId, attachedId) {
+    const msg = `user ${userId} already liked content ${attachedId}, but called like`
+    super(`already liked error: ${msg}`, 6000002, 400, '已经点过赞啦')
+  }
+}
+
+class NeverLikedError extends httpError {
+  constructor (userId, attachedId) {
+    const msg = `user ${userId} never liked content ${attachedId}, but called dislike`
+    super(`never liked error: ${msg}`, 6000001, 400, '还没有点过赞呢，不能取消呦')
+  }
+}
+
+
 class weChatError extends ValidationError {
   constructor(msg) {
     super(`wechat api error: ${msg}`, 30001, 500, '微信服务调用失败')
@@ -64,5 +79,7 @@ module.exports = {
   sign,
   InternalError,
   login,
-  weChatError
+  weChatError,
+  AlreadyLikedError,
+  NeverLikedError
 }

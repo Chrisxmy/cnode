@@ -7,6 +7,7 @@ var bodyParser = require('body-parser')
 var index = require('./routes/index')
 var users = require('./routes/users')
 var topic = require('./routes/topic')
+var msgRouter = require('./routes/msg');
 
 
 require('./servers/mongdb_server')
@@ -32,6 +33,7 @@ app.use(require('./middleware/req_log').logRequests())
 app.use('/', index)
 app.use('/users', users)
 app.use('/topic', topic)
+app.use('/msg', msgRouter)
 
 app.use(function(req) {
   if (req.pathName === '/favicon.ico') {
